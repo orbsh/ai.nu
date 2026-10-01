@@ -2,9 +2,9 @@ use sqlite.nu *
 use base.nu
 use data.nu
 
-export def cmpl-sessoin-offset [ctx] {
+export def cmpl-sessoin-offset [buffer: string] {
     let session = if NU_ARGX_EXISTS in $env {
-        $ctx | argx parse | get -o opt.fork
+        $buffer | argx parse | get -o opt.fork
     }
     let session = if ($session | is-empty) { $env.AI_SESSION } else { $session }
     let w = ((term size).columns / 2 | math floor) - 8
@@ -14,21 +14,21 @@ export def cmpl-sessoin-offset [ctx] {
     { completions: $c, options: { sort: false, partial: false } }
 }
 
-def cmpl-models-temp [path ctx] {
+def cmpl-models-temp [path buffer] {
     let provider = if NU_ARGX_EXISTS in $env {
-        let ctx = $ctx | argx parse
+        let ctx = $buffer | argx parse
         $ctx | get -o $path
     }
     let s = data session -p $provider
     base ai-models $s
 }
 
-export def cmpl-models [ctx] {
-    cmpl-models-temp ([opt provider] | into cell-path)  $ctx
+export def cmpl-models [buffer: string] {
+    cmpl-models-temp ([opt provider] | into cell-path)  $buffer
 }
 
-export def cmpl-models-pos [ctx] {
-    cmpl-models-temp ([pos provider] | into cell-path) $ctx
+export def cmpl-models-pos [buffer: string] {
+    cmpl-models-temp ([pos provider] | into cell-path) $buffer
 }
 
 export def cmpl-tools [] {
@@ -50,8 +50,8 @@ export def cmpl-previous [] {
     | { completions: $in, options: { sort: false } }
 }
 
-export def 'cmpl-role' [ctx] {
-    let args = $ctx | split row '|' | last | str trim -l | split row ' ' | slice 1..
+export def 'cmpl-role' [buffer: string] {
+    let args = $buffer | split row '|' | last | str trim -l | split row ' ' | slice 1..
     let len = $args | length
     match $len {
         1 => {
@@ -69,8 +69,8 @@ export def 'cmpl-role' [ctx] {
 }
 
 
-def cmpl-config [context] {
-    let ctx = $context | split row -r '\s+' | slice 1..
+def cmpl-config [buffer: string] {
+    let ctx = $buffer | split row -r '\s+' | slice 1..
     if ($ctx | length) < 2 {
         return [provider, prompt, function]
     } else {
