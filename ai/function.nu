@@ -33,7 +33,7 @@ export def closure-list [list] {
                 mut v = $i.v
                 for j in [enum description] {
                     if ($i.v | get -o $j | describe -d).type == 'closure' {
-                        let r = (do ($i.v | get $j) $c)
+                        let r = do ($i.v | get $j) $c
                         $v = $v | upsert $j $r
                     }
                 }

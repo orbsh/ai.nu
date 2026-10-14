@@ -84,13 +84,13 @@ export def --env ollama-chat [
     }
     if not $oneshot {
         if ($env.OLLAMA_CHAT | is-empty) or ($model not-in $env.OLLAMA_CHAT) {
-            $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
+            $env.OLLAMA_CHAT = $env.OLLAMA_CHAT | insert $model []
         }
         if $reset {
-            $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model [])
+            $env.OLLAMA_CHAT = $env.OLLAMA_CHAT | update $model []
             print '✨'
         }
-        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
+        $env.OLLAMA_CHAT = $env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg}
     }
 
     let r = http post -t application/json $"($env.OLLAMA_BASEURL)/api/chat" {
@@ -116,7 +116,7 @@ export def --env ollama-chat [
     }
     if not $oneshot {
         let r = {role: 'assistant', content: $r.msg, token: $r.token}
-        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
+        $env.OLLAMA_CHAT = $env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r }
     }
     if $out { $r.msg }
 }
